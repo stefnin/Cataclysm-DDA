@@ -49,6 +49,23 @@
         "watertight": true
     },
     {
+        "id": "cup_plastic_closed",
+        "type": "CONTAINER",
+        "symbol": ")",
+        "color": "light_cyan",
+        "name": "plastic cup",
+        "category": "other",
+        "description": "A small, vacuum formed cup, essentially trash.",
+        "price": 0,
+        "weight": 6,
+        "volume": 1,
+        "to_hit": 1,
+        "material": "plastic",
+        "contains": 1,
+        "closed": true,
+        "watertight": true
+    },
+    {
         "id": "bottle_glass",
         "type": "CONTAINER",
         "symbol": ")",
@@ -104,6 +121,26 @@
         "qualities": [["CONTAIN", 1], ["BOIL", 2]]
     },
     {
+        "id": "can_drink_closed",
+        "type": "CONTAINER",
+        "symbol": ")",
+        "color": "light_blue",
+        "name": "aluminum can",
+        "category": "other",
+        "description": "An aluminum can, like what soda comes in.",
+        "price": 0,
+        "weight": 13,
+        "volume": 1,
+        "bashing": 2,
+        "to_hit": -3,
+        "material": "aluminum",
+        "contains": 1,
+        "watertight": true,
+        "preserves": true,
+        "closed": true,
+        "qualities": [["CONTAIN", 1], ["BOIL", 2]]
+    },
+    {
         "id":"bowl_pewter",
         "type":"CONTAINER",
         "color":"light_cyan",
@@ -134,6 +171,24 @@
         "contains": 1,
         "watertight": true,
         "preserves": true,
+        "qualities": [["CONTAIN", 1], ["BOIL", 2]]
+    },
+    {
+        "id": "can_food_closed",
+        "type": "CONTAINER",
+        "symbol": ")",
+        "color": "blue",
+        "name": "tin can",
+        "category": "other",
+        "description": "A tin can, like what beans come in.",
+        "price": 0,
+        "weight": 400,
+        "volume": 1,
+        "material": "steel",
+        "contains": 1,
+        "watertight": true,
+        "preserves": true,
+        "closed": true,
         "qualities": [["CONTAIN", 1], ["BOIL", 2]]
     },
     {

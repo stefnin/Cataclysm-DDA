@@ -6793,7 +6793,7 @@ bool map::has_rotten_away( item &itm, const tripoint &pnt ) const
     } else if( itm.type->container && itm.type->container->preserves ) {
         // Containers like tin cans preserves all items inside, they do not rot at all.
         return false;
-    } else if( itm.type->container && itm.type->container->seals ) {
+    } else if( itm.type->container && (itm.type->container->seals || itm.type->container->closed) ) {
         // Items inside rot but do not vanish as the container seals them in.
         for( auto &c : itm.contents ) {
             c.calc_rot( pnt );

@@ -3443,7 +3443,7 @@ bool item::is_container() const
 
 bool item::is_watertight_container() const
 {
-    return type->container && type->container->watertight && type->container->seals;
+    return type->container && type->container->watertight && (type->container->seals || type->container->closed);
 }
 
 bool item::is_sealable_container() const
@@ -3458,7 +3458,7 @@ bool item::is_bucket() const
     // Making them buckets would cause weirdness
     return type->container != nullptr &&
            type->container->watertight &&
-           !type->container->seals &&
+           !(type->container->seals || type->container->closed) &&
            !type->container->preserves;
 }
 

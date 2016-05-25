@@ -1222,6 +1222,7 @@ void Item_factory::load( islot_container &slot, JsonObject &jo )
 {
     slot.contains = jo.get_int( "contains" );
     slot.seals = jo.get_bool( "seals", false );
+    slot.closed = jo.get_bool("closed",false);
     slot.watertight = jo.get_bool( "watertight", false );
     slot.preserves = jo.get_bool( "preserves", false );
 }

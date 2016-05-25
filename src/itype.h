@@ -130,6 +130,10 @@ struct islot_container {
      */
     bool seals = false;
     /**
+    * Is closed. This flag should only be used when seals is false.
+    */
+    bool closed = false;
+    /**
      * Can hold liquids.
      */
     bool watertight = false;
@@ -705,4 +709,3 @@ public:
 };
 
 #endif
-

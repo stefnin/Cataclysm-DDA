@@ -1247,6 +1247,12 @@ std::string item::info( bool showtext, std::vector<iteminfo> &info ) const
 
         if( c.seals ) {
             temp1 << _( "can be <info>resealed</info>, " );
+        } else {
+            if( c.closed ) {
+                temp1 << _( "is <info>closed</info>, ");
+            } else {
+                temp1 << _( "is <info>open</info>, ");
+            }
         }
         if( c.watertight ) {
             temp1 << _( "is <info>watertight</info>, " );

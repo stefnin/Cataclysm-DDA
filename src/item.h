@@ -425,6 +425,16 @@ class item : public JsonSerializer, public JsonDeserializer, public visitable<it
     bool is_watertight_container() const;
     /** Whether this is sealable container which can be resealed after removing part of it's content */
     bool is_sealable_container() const;
+
+    /** Whether this is a closed container which cannot be resealed */
+    bool is_closed_container() const;
+
+    /** Whether this is an open container which cannot be resealed */
+    bool is_open_container() const;
+
+    /** Open the container */
+    void open_closed_container();
+
     /** Whether this item has no contents at all. */
     bool is_container_empty() const;
     /**

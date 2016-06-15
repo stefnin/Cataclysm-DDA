@@ -10448,11 +10448,14 @@ bool game::handle_liquid( item &liquid, item * const source, const int radius,
     }
     std::vector<std::function<void()>> actions;
 
+    bool still_in_inventory = true;
     if( liquid.is_food( &u ) ) {
         menu.addentry( -1, true, 'e', _( "Consume it" ) );
         actions.emplace_back( [&]() {
             // consume_item already consumes moves.
-            u.consume_item( liquid );
+            if( u.consume_item( liquid ) ){
+                still_in_inventory = false;
+            }
         } );
     }
 
@@ -10468,6 +10471,7 @@ bool game::handle_liquid( item &liquid, item * const source, const int radius,
             }
             if( u.pour_into( *veh, liquid ) ) {
                 u.mod_moves( -100 );
+                still_in_inventory = false;
             }
         } );
     }
@@ -10486,7 +10490,9 @@ bool game::handle_liquid( item &liquid, item * const source, const int radius,
                 serialize_liquid_target( u.activity, target_pos );
                 return;
             }
-            iexamine::pour_into_keg( target_pos, liquid );
+            if( iexamine::pour_into_keg( target_pos, liquid ) ) {
+                still_in_inventory = false;
+            }
             u.mod_moves( -100 );
         } );
     }
@@ -10520,6 +10526,7 @@ bool game::handle_liquid( item &liquid, item * const source, const int radius,
             return;
         }
         m.add_item_or_charges( target_pos, liquid, 1 );
+        still_in_inventory = false;
         liquid.charges = 0;
         u.mod_moves( -100 );
     } );
@@ -10534,12 +10541,23 @@ bool game::handle_liquid( item &liquid, item * const source, const int radius,
 
     menu.query();
     const size_t chosen = static_cast<size_t>( menu.ret );
+
+
+    auto test_container = [&]() {
+        if( still_in_inventory && liquid.is_open_container() && !liquid.contents.empty() ) {
+            liquid.spill_contents( u.pos() );
+            add_msg( _("You accidentally spill the %s."), liquid_name.c_str() );
+        }
+    };
+
     if( chosen >= actions.size() ) {
         add_msg( _( "Never mind." ) );
+        test_container();
         // Explicitly canceled all options (container, drink, pour).
         return false;
     }
     actions[chosen]();
+    test_container();
     return true;
 }
 
@@ -11516,6 +11534,11 @@ bool game::unload( item &it )
 {
     // Unload a container consuming moves per item successfully removed
     if( it.is_container() && !it.contents.empty() ) {
+
+        if( it.is_closed_container() ) {
+            it.open_closed_container();
+        }
+
         it.contents.erase( std::remove_if( it.contents.begin(), it.contents.end(), [this]( item& e ) {
             int mv = u.item_handling_cost( e );
             if( !add_or_drop_with_msg( u, e ) ) {

@@ -52,6 +52,8 @@
 #include "vitamin.h"
 #include "fault.h"
 
+//#include "pickup.h"
+
 #include <map>
 #include <iterator>
 
@@ -9281,6 +9283,9 @@ bool player::consume_item( item &target )
     }
     item *to_eat = nullptr;
     if( target.is_food_container( this ) ) {
+        if( target.is_closed_container() ) {
+            target.open_closed_container();
+        }
         to_eat = &target.contents.front();
     } else if( target.is_food( this ) ) {
         to_eat = &target;
@@ -9376,7 +9381,9 @@ bool player::consume(int target_position)
 {
     auto &target = i_at( target_position );
     const bool was_in_container = target.is_food_container( this );
+    bool was_consumed;
     if( consume_item( target ) ) {
+        was_consumed = true;
         if( was_in_container ) {
             i_rem( &target.contents.front() );
         } else {
@@ -9402,6 +9409,82 @@ bool player::consume(int target_position)
                 add_msg(m_info, _("%c - an empty %s"), (target.invlet ? target.invlet : ' '), target.tname().c_str());
             }
         }
+    } else {
+        // item was not consumed
+        was_consumed = false;
+        if( was_in_container && target.is_open_container() && ( target_position >= 0 ) ) {
+            if( !is_npc() ) {
+                const bool is_infinite = target.charges == std::numeric_limits<long>::max();
+                const std::string target_name = is_infinite ? target.tname() : target.display_name( target.charges );
+
+                bool still_in_inventory = true;
+                std::vector<std::function<void()>> actions;
+                uimenu menu;
+                menu.return_invalid = false;
+                menu.text = string_format( _( "What to do with the %s?" ), target_name.c_str() );
+
+                menu.addentry( -1, true, 'g', _( "Spill on the ground" ) );
+                actions.emplace_back( [&]() {
+                    tripoint target_pos = g->u.pos();
+                    const std::string targetstr = string_format( _( "Pour %s where?" ), target_name.c_str() );
+                    g->refresh_all();
+                    bool spilled = false;
+                    while( !spilled ) {
+                        if( choose_adjacent( targetstr, target_pos ) ) {
+                            if( !g->m.can_put_items_ter_furn( target_pos ) ) {
+                                add_msg( m_info, _( "You can't pour there!" ) );
+                            } else {
+                                target.spill_contents(target_pos);
+                                g->u.mod_moves( -100 );
+                                spilled = true;
+                                still_in_inventory = false;
+                            }
+                        }
+                    }
+                } );
+
+                menu.addentry( -1, !g->u.weapon.has_flag( "NO_UNWIELD" ), 'w',
+                                _("Dispose of %s and wield %s"), g->u.weapon.display_name().c_str(),
+                                target_name.c_str() );
+                actions.emplace_back( [&]() {
+                    if( g->u.wield(target) ){
+                        still_in_inventory = false;
+                        if( g->u.weapon.invlet ) {
+                            add_msg( m_info, _("Wielding %c - %s"), g->u.weapon.invlet,
+                                    g->u.weapon.display_name().c_str() );
+                        } else {
+                            add_msg( m_info, _("Wielding - %s"), g->u.weapon.display_name().c_str() );
+                        }
+                    }
+                } );
+
+                menu.addentry( -1, true, 'd', _( "Drop it" ) );
+                actions.emplace_back( [&]() {
+                    tripoint target_pos = g->u.pos();
+                    const std::string targetstr = string_format( _( "Drop %s where?" ), target_name.c_str() );
+                    g->refresh_all();
+                    if( choose_adjacent( targetstr, target_pos ) ) {
+                        g->m.add_item_or_charges( target_pos, i_rem( target_position ) );
+                        g->u.mod_moves( -250 );
+                        still_in_inventory = false;
+                    }
+                } );
+
+                menu.query();
+                const size_t chosen = static_cast<size_t>( menu.ret );
+                if( chosen >= actions.size() ) {
+                    add_msg( _( "Never mind." ) );
+                }
+                actions[chosen]();
+
+                if( still_in_inventory && !target.contents.empty() ) {
+                    target.spill_contents( g->u.pos() );
+                    add_msg( _( "You accidentally spill the %s." ), target_name.c_str() );
+                }
+            } else {
+                target.spill_contents( pos() );
+            }
+        }
     }
 
     if( target_position >= 0 ) {
@@ -9410,7 +9493,7 @@ bool player::consume(int target_position)
         inv.unsort();
     }
 
-    return true;
+    return was_consumed;
 }
 
 void player::rooted_message() const
@@ -10624,6 +10707,9 @@ void player::use(int inventory_position)
     } else if (used->is_food() || used->is_food_container()) {
         consume(inventory_position);
         return;
+    } else if ( used->is_closed_container() && used->contents.empty() ) {
+            used->open_closed_container();
+            return;
     } else if (used->is_book()) {
         read(inventory_position);
         return;

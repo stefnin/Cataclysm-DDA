@@ -63,7 +63,7 @@ const efftype_id effect_weed_high( "weed_high" );
 
 enum item::LIQUID_FILL_ERROR : int {
     L_ERR_NONE, L_ERR_NO_MIX, L_ERR_NOT_CONTAINER, L_ERR_NOT_WATERTIGHT,
-    L_ERR_NOT_SEALED, L_ERR_FULL
+    L_ERR_NOT_SEALED, L_ERR_FULL, L_ERR_CONTAINER_CLOSED
 };
 
 std::string const& rad_badge_color(int const rad)
@@ -3457,6 +3457,21 @@ bool item::is_sealable_container() const
     return type->container && type->container->seals;
 }
 
+bool item::is_closed_container() const
+{
+    return type->container && !type->container->seals && type->container->closed && type->container->watertight;
+}
+
+bool item::is_open_container() const
+{
+    return type->container && !type->container->seals && !type->container->closed && type->container->watertight;
+}
+
+void item::open_closed_container()
+{
+    convert( type->id.substr( 0, type->id.size() - 7 ) ); // 7 is the size of "_closed".
+}
+
 bool item::is_bucket() const
 {
     // That "preserves" part is a hack:
@@ -4905,8 +4920,14 @@ item::LIQUID_FILL_ERROR item::has_valid_capacity_for_liquid( const item &liquid,
         return L_ERR_NOT_WATERTIGHT;
     }
 
-    if( !type->container->seals && ( !allow_bucket || !is_bucket() ) ) {
-        return L_ERR_NOT_SEALED;
+    if( !type->container->seals) {
+        if (type->container->closed) {
+            return L_ERR_CONTAINER_CLOSED;
+        } else {
+            if( !allow_bucket || !is_bucket() ) {
+                return L_ERR_NOT_SEALED;
+            }
+        }
     }
 
     if (!contents.empty()) {
@@ -4961,6 +4982,8 @@ bool item::fill_with( item &liquid, std::string &err, bool allow_bucket )
         case L_ERR_FULL:
             err = string_format( _( "Your %1$s can't hold any more %2$s." ), tname().c_str(), liquid.tname().c_str());
             return false;
+        case L_ERR_CONTAINER_CLOSED:
+            err = string_format( _( "That %s is closed." ), tname().c_str());
         default:
             err = string_format( _( "Unimplemented liquid fill error '%s'." ),lferr);
             return false;

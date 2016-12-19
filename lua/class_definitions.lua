@@ -426,6 +426,8 @@ classes = {
             reactor_plut = { type = "int", writable = true },
             recoil = { type = "int", writable = true },
             scent = { type = "int", writable = true },
+            skill_increase_amount = { type = "int", writable = false },
+            skill_used = { type = "string", writable = false },
             slow_rad = { type = "int", writable = true },
             stamina = { type = "int", writable = true },
             start_location = { type = "start_location_id", writable = true },

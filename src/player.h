@@ -1312,6 +1312,9 @@ class player : public Character, public JsonSerializer, public JsonDeserializer
 
         int focus_pool;
 
+        int skill_increase_amount;
+        std::string skill_used;
+
         std::vector<matype_id> ma_styles;
         matype_id style_selected;
         bool keep_hands_free;

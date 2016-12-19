@@ -12757,6 +12757,11 @@ void player::practice( const skill_id &id, int amount, int cap )
 
     if (amount > 0 && level.isTraining()) {
         int oldLevel = get_skill_level( id );
+        if (is_player()) {
+            skill_increase_amount = amount;
+            skill_used = skill.ident().str();
+            lua_callback("on_skill_used");
+        }
         get_skill_level( id ).train(amount);
         int newLevel = get_skill_level( id );
         if (is_player() && newLevel > oldLevel) {

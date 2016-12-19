@@ -1,0 +1,11 @@
+[
+  {
+    "type": "MOD_INFO",
+    "ident": "StatEvolution",
+    "name": "StatEvolution",
+    "authors": [ "Stephane Ninin" ],
+    "description": "Allows stats to raise naturally via skill use.",
+    "category": "rebalance",
+    "dependencies": [ "dda" ]
+  }
+]

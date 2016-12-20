@@ -194,6 +194,9 @@ class game
 
         /** Returns false if saving failed. */
         bool save();
+
+        bool save_lua_data(const std::string &extension, const std::string &data);
+
         /** Deletes the given world. If delete_folder is true delete all the files and directories
          *  of the given world folder. Else just avoid deleting the two config files and the directory
          *  itself. */

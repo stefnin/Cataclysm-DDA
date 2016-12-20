@@ -361,6 +361,7 @@ classes = {
             { name = "resonance_cascade", rval = nil, args = { "tripoint" } },
             { name = "revive_corpse", rval = "bool", args = { "tripoint", "item" } },
             { name = "save", rval = "bool", args = { } },
+            { name = "save_lua_data", rval="bool", args = { "string", "string"} },
             { name = "scrambler_blast", rval = nil, args = { "tripoint" } },
             { name = "shockwave", rval = nil, args = { "tripoint", "int", "int", "int", "int", "bool" } },
             { name = "spawn_hallucination", rval = "bool", args = { } },

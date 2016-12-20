@@ -3833,7 +3833,19 @@ bool game::save_player_data()
         fout << u.dump_memorial();
     }, _( "player memorial" ) );
 
+    lua_callback("on_save_player_data");
     return saved_data && saved_weather && saved_log;
+}
+
+bool game::save_lua_data(const std::string &extension, const std::string &data) {
+
+    const std::string luadatafile = world_generator->active_world->world_path + "/" + base64_encode(u.name) + extension;
+
+    const bool saved_lua_data = write_to_file( luadatafile, [&]( std::ostream &fout ) {
+        fout <<  data;
+    }, _("lua data") );
+
+    return saved_lua_data;
 }
 
 bool game::save()

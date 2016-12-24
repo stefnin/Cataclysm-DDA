@@ -3693,6 +3693,7 @@ void game::load(std::string worldname, std::string name)
     }
 
     u.reset();
+    lua_callback("on_game_loaded");
     draw();
 }
 
@@ -3823,6 +3824,8 @@ bool game::save_player_data()
 {
     const std::string playerfile = world_generator->active_world->world_path + "/" + base64_encode(u.name);
 
+    lua_callback("on_save_player_data");
+
     const bool saved_data = write_to_file( playerfile + ".sav", [&]( std::ostream &fout ) {
         serialize(fout);
     }, _( "player data" ) );
@@ -3833,7 +3836,6 @@ bool game::save_player_data()
         fout << u.dump_memorial();
     }, _( "player memorial" ) );
 
-    lua_callback("on_save_player_data");
     return saved_data && saved_weather && saved_log;
 }
 

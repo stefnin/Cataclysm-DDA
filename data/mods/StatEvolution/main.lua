@@ -51,19 +51,28 @@ function MOD.on_skill_used()
     --SE_log("Skill used: "..player.skill_used.." - increase amount: "..player.skill_increase_amount)
     local old_amount = skill_usage[player.skill_used].skill_amount
 
-    -- Note: it is not really required to pass player.skill_used because it can be accessed in SE_functions.check_amount_increase
-    -- TODO: compute a new amount based on the skill level
+    local modified_amount = SE_functions.check_amount_increase(player.skill_increase_amount)
 
-    if (SE_functions.check_amount_increase(player.skill_used)) then
-        local new_amount = old_amount + player.skill_increase_amount
-        --SE_log("New skill amount: "..new_amount)
-        skill_usage[player.skill_used].skill_amount = new_amount
-        local current_level = player:get_skill_level(skill_id(player.skill_used))
-        if ( skill_usage[player.skill_used].skill_amount  > 100*(current_level+1)*(current_level+1) ) then
-            skill_usage[player.skill_used].skill_level = skill_usage[player.skill_used].skill_level + 1
-            skill_usage[player.skill_used].skill_amount = 0
-        end
+    local new_amount = old_amount + modified_amount
+
+    --SE_log("New skill amount: "..new_amount)
+    skill_usage[player.skill_used].skill_amount = new_amount
+    local current_level = player:get_skill_level(skill_id(player.skill_used))
+    if ( skill_usage[player.skill_used].skill_amount  > 100*(current_level+1)*(current_level+1) ) then
+        skill_usage[player.skill_used].skill_level = skill_usage[player.skill_used].skill_level + 1
+        skill_usage[player.skill_used].skill_amount = 0
     end
+
+    -- if (SE_functions.check_amount_increase(player.skill_used)) then
+    --     local new_amount = old_amount + player.skill_increase_amount
+    --     --SE_log("New skill amount: "..new_amount)
+    --     skill_usage[player.skill_used].skill_amount = new_amount
+    --     local current_level = player:get_skill_level(skill_id(player.skill_used))
+    --     if ( skill_usage[player.skill_used].skill_amount  > 100*(current_level+1)*(current_level+1) ) then
+    --         skill_usage[player.skill_used].skill_level = skill_usage[player.skill_used].skill_level + 1
+    --         skill_usage[player.skill_used].skill_amount = 0
+    --     end
+    -- end
 end
 
 -- function print_stat(statName)
@@ -155,7 +164,9 @@ function skill_points_needed(stat)
     return stat + 3
 end
 
-function check_amount_increase_v1(skillName)
+function check_amount_increase_v1(amount)
+    --SE_log("original amount : "..amount)
+    local skillName = player.skill_used
     --SE_log("skillName : "..skillName)
     local statName = skill_to_stat[skillName]
     --SE_log("statName : "..statName)
@@ -169,9 +180,12 @@ function check_amount_increase_v1(skillName)
     --SE_log("current_level : "..current_level)
 
     if (current_level >= skillMin) then
-        return true
+        --SE_log("amount: "..amount)
+        return amount
     else
-        return false
+        local modified_amount = math.ceil(amount / (1 + skillMin - current_level)^2)
+        --SE_log("modified_amount: "..modified_amount)
+        return modified_amount
     end
 end
 

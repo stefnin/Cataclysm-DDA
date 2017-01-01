@@ -402,3 +402,17 @@ void MonsterGroupManager::check_group_definitions()
         }
     }
 }
+
+int MonsterGroupManager::MonsterGroupCount() {
+    return monsterGroupMap.size();
+}
+
+std::vector<mongroup_id> MonsterGroupManager::get_mongroup_id_all()
+{
+    std::vector<mongroup_id> rval;
+    std::map<mongroup_id, MonsterGroup>::iterator it;
+    for (it = monsterGroupMap.begin(); it != monsterGroupMap.end(); it++) {
+        rval.push_back(it->first);
+    }
+    return rval;
+}

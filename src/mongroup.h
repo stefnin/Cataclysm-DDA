@@ -170,6 +170,10 @@ class MonsterGroupManager
         static const MonsterGroup &GetMonsterGroup( const mongroup_id &group );
         static const MonsterGroup &GetUpgradedMonsterGroup( const mongroup_id &group );
 
+        static int MonsterGroupCount();
+        static std::vector<mongroup_id> get_mongroup_id_all();
+
+
         static void check_group_definitions();
 
         static void ClearMonsterGroups();

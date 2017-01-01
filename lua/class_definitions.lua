@@ -1787,6 +1787,17 @@ classes = {
             { name = "IsMonsterInGroup", rval = "bool", args = { "mtype_id" } },
         }
     },
+    MonsterGroupEntry = {
+        string_id = "mtype_id",
+        attributes = {
+            frequency = { type = "int" , writable = true },
+            cost_multiplier = { type = "int" , writable = true },
+            pack_minimum = { type = "int" , writable = true },
+            pack_maximum = { type = "int" , writable = true },
+        },
+        functions = {
+        },
+    },
     mtype = {
         string_id = "mtype_id",
         attributes = {
@@ -2197,7 +2208,17 @@ global_functions = {
         cpp_name = "get_calendar_turn_wrapper",
         args = {},
         rval = "calendar&"
-    }
+    },
+    monster_group_count = {
+        cpp_name = "MonsterGroupManager::MonsterGroupCount",
+        args = {},
+        rval = "int"
+    },
+    get_monster_group = {
+        cpp_name = "MonsterGroupManager::GetMonsterGroup",
+        args = { "mongroup_id" },
+        rval = "MonsterGroup&"
+    },
 }
 
 --[[

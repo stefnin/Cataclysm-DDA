@@ -922,6 +922,10 @@ static void add_msg_wrapper(const std::string &text) {
     add_msg( "%s", text.c_str() );
 }
 
+//
+//static int game_MonsterGroupCount() {
+//}
+
 // items = game.items_at(x, y)
 static int game_items_at(lua_State *L)
 {
@@ -994,6 +998,31 @@ static int game_get_monster_types(lua_State *L)
 
         lua_pushnumber(L, i + 1);
         LuaValue<mtype_id>::push( L, mtypes[i].id );
+        lua_rawset(L, -3);
+    }
+
+    return 1; // 1 return values
+}
+
+// monster_types = game.get_monster_types()
+static int game_get_monster_group_ids(lua_State *L)
+{
+    //const auto mtypes = MonsterGenerator::generator().get_all_mtypes();
+    const auto mongroup_ids = MonsterGroupManager::get_mongroup_id_all();
+
+    lua_createtable(L, mongroup_ids.size(), 0); // Preallocate enough space for all our monster types.
+
+    // Iterate over the monster list and insert each monster into our returned table.
+    for( size_t i = 0; i < mongroup_ids.size(); ++i ) {
+        // The stack will look like this:
+        // 1 - t, table containing id
+        // 2 - k, index at which the next id will be inserted
+        // 3 - v, next id to insert
+        //
+        // lua_rawset then does t[k] = v and pops v and k from the stack
+
+        lua_pushnumber(L, i + 1);
+        LuaValue<mongroup_id>::push( L, mongroup_ids[i].c_str() );
         lua_rawset(L, -3);
     }
 
@@ -1127,6 +1156,7 @@ static const struct luaL_Reg global_funcs [] = {
     {"dofile", game_dofile},
     {"get_monster_types", game_get_monster_types},
     {"get_item_groups", game_get_item_groups},
+    {"get_monster_group_ids", game_get_monster_group_ids},
     {NULL, NULL}
 };
 
